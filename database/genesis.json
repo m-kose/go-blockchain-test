@@ -1,0 +1,7 @@
+{
+    "genesis_time": "2022-08-01T00:18:46.000000000Z",
+    "chain_id": "the-blockchain-bar-ledger",
+    "balances": {
+    "andrej": 1000000
+    }
+    }
