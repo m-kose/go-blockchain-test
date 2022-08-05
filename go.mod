@@ -1,4 +1,4 @@
-module github.com/web3coach/the-blockchain-bar
+module github.com/m-kose/go
 
 go 1.16
 
