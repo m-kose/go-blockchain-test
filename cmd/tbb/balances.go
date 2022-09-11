@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/m-kose/go/database"
+	"github.com/spf13/cobra"
 )
 
 func balancesCmd() *cobra.Command {
@@ -19,28 +19,31 @@ func balancesCmd() *cobra.Command {
 		},
 	}
 
-	balancesCmd.AddCommand(balancesListCmd)
+	balancesCmd.AddCommand(balancesListCmd())
 
 	return balancesCmd
 }
+func balancesListCmd() *cobra.Command {
+	var balancesListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "Lists all balances.",
+		Run: func(cmd *cobra.Command, args []string) {
+			dataDir, _ := cmd.Flags().GetString(flagDataDir)
+			state, err := database.NewStateFromDisk(dataDir)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+			defer state.Close()
 
-var balancesListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Lists all balances.",
-	Run: func(cmd *cobra.Command, args []string) {
-		state, err := database.NewStateFromDisk()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		defer state.Close()
-
-		fmt.Println("Accounts balances:")
-		fmt.Printf("Accounts balances at %x:\n", state.LatestSnapshot())
-		fmt.Println("__________________")
-		fmt.Println("")
-		for account, balance := range state.Balances {
-			fmt.Println(fmt.Sprintf("%s: %d", account, balance))
-		}
-	},
+			fmt.Printf("Accounts balances at %x:\n", state.LatestBlockHash())
+			fmt.Println("__________________")
+			fmt.Println("")
+			for account, balance := range state.Balances {
+				fmt.Println(fmt.Sprintf("%s: %d", account, balance))
+			}
+		},
+	}
+	addDefaultRequiredFlags(balancesListCmd)
+	return balancesListCmd
 }
